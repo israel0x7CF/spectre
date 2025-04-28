@@ -7,7 +7,6 @@ import com.spectrun.spectrum.MessageTemplate.createInstanceTemplate;
 import com.spectrun.spectrum.models.Instances;
 import com.spectrun.spectrum.models.Subscriptions;
 import com.spectrun.spectrum.services.Implementations.InstanceService;
-import com.spectrun.spectrum.services.Implementations.JWTService;
 import com.spectrun.spectrum.services.Implementations.ModuleService;
 import com.spectrun.spectrum.services.Implementations.UserService;
 import com.spectrun.spectrum.utils.API.Request;
@@ -22,6 +21,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -54,24 +54,28 @@ public class InstanceController {
     }
     @PostMapping("/create/instance")
     public ResponseEntity<?> createNewInstance(@RequestBody InstanceModuleDto installationData){
-        InstanceDto newInstance = installationData.getInstallationInstance();
+        String InstanceName = installationData.getInstallationInstance().getInstanceName();
         ModuleDto installationModule = installationData.getInstallationModule();
         //get the user from context
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         UserDTO subscriptionUser = this.userService.getUserByEmail(username);
         if(subscriptionUser != null){
-            Subscriptions subscription = subscriptionUser.getSubscription();
+            logger.info("No Subs User");
+                Subscriptions subscription = subscriptionUser.getSubscription();
+
             if(subscription != null){
+                logger.info(" Subs Found");
                 long limit = subscriptionUser.getSubscription().getUsageLimits().getInstanceLimit();
                 List<Instances> userInstances = subscriptionUser.getInstances();
                 String active = String.valueOf(Status.Active);
                 long activeUserInstances = userInstances.stream()
-                        .filter(x-> String.valueOf(x.getStatus()) == active)
+                        .filter(x-> String.valueOf(x.getStatus()).equals(active))
                         .count();
                 if(limit > activeUserInstances){
                     //todo:create instances
-                    createInstanceTemplate template = new createInstanceTemplate(newInstance.getInstanceName(),installationModule.getModuleName(),installationModule.getModulePath());
+                    //todo: remove this logic and depricate this endpoint
+                    createInstanceTemplate template = new createInstanceTemplate(InstanceName,installationModule.getModuleName(),installationModule.getModulePath());
                     this.createInstance.send("create_instance",template);
                 }
                 else{
@@ -79,11 +83,26 @@ public class InstanceController {
                             "Reached Instance Limit for Your Subscribtion. Either Remove Instances Or Upgrade Plan",
                             HttpStatus.BAD_REQUEST);
                 }
+            }else{
+                return new ResponseEntity<>(
+                        "No Subs",
+                        HttpStatus.BAD_REQUEST);
             }
         }
+        else{
+            return  null;
+        }
+        // todo:
+        // 1 create the instance service, save only by name
+        InstanceDto newInstance = InstanceDto.builder()
+                .instanceName(InstanceName)
+                .status(Status.Pending)
+                .userId(subscriptionUser.getId())
+                .build();
         InstanceDto instanceResponse = this.instanceService.createNewInstance(newInstance);
 
-        return new ResponseEntity<>(instanceResponse, HttpStatus.OK);
+
+        return new ResponseEntity<>("Ok", HttpStatus.OK);
     }
     @GetMapping("/get/Instances")
     public ResponseEntity<List<InstanceDto>> getAllInstances(){
@@ -102,10 +121,8 @@ public class InstanceController {
        return new ResponseEntity<>(userInstances,HttpStatus.OK);
     }
 
-    @PostMapping("/install")
-    public ResponseEntity <?>InstallModuleToInstance(@RequestBody instanceModuleInstallationDto payload) throws Exception {
-        long moduleId = payload.getModuleId();
-        long instanceId = payload.getInstanceId();
+    @PutMapping("/install/{moduleId}/{instanceId}")
+    public ResponseEntity <?>InstallModuleToInstance(@PathVariable int moduleId , int instanceId) throws Exception {
         ModuleDto moduleDto = this.moduleService.getModuleById(moduleId);
         InstanceDto instance = this.instanceService.getInstanceById(instanceId);
         String host = "127.0.0.1";
@@ -114,16 +131,39 @@ public class InstanceController {
         moduleInfo.setHost(host);
         moduleInfo.setUser(instance.getAdminUserName());
         moduleInfo.setPassword(instance.getAdminPassword());
-        moduleInfo.setPort(instance.getInstanceaddress());
         moduleInfo.setModule(moduleDto.getModuleName());
-        if(instance.getStatus().equals(Status.Active)){
-            moduleInfo.setIsActive(true);
-        }
-        logger.info("moduleName:"+moduleDto.getModuleName());
-        logger.info("instance name"+instance.getInstanceName()+":"+moduleInfo.getPort());
+        String  port = getPortFromAddress(instance.getInstanceaddress());
+        moduleInfo.setPort(port);
+//        if(instance.getStatus().equals(Status.Active)){
+//            moduleInfo.setIsActive(true);
+//            Request<InstallModuleDto, moduleInstallResponseDTO> request = new Request<>();
+//            com.spectrun.spectrum.utils.API.ResponseBody.ResponseBody<moduleInstallResponseDTO> response = request.handleApiCall(moduleInfo,"http://127.0.0.1:5050/api/v1/containerManager/install/running",new TypeReference<ResponseBody<moduleInstallResponseDTO>>() {});
+//            return new ResponseEntity<>(response,HttpStatus.OK);
+//        }
         Request<InstallModuleDto, moduleInstallResponseDTO> request = new Request<>();
         com.spectrun.spectrum.utils.API.ResponseBody.ResponseBody<moduleInstallResponseDTO> response = request.handleApiCall(moduleInfo,"http://127.0.0.1:5050/api/v1/containerManager/installModule",new TypeReference<ResponseBody<moduleInstallResponseDTO>>() {});
         return new ResponseEntity<>(response,HttpStatus.OK);
     }
+
+    @GetMapping("/install/running")
+    public ResponseEntity<?>installToRunningModule(@RequestParam Long id) throws  Exception{
+        InstanceDto runningInstance = this.instanceService.getInstanceById(id);
+        if(runningInstance != null){
+             logger.info("Active instance \n"+runningInstance.toString());
+
+            return  new ResponseEntity<InstanceDto>(runningInstance,HttpStatus.NOT_FOUND);
+        }
+        return  new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    }
+    @GetMapping("/status/{status}")
+    public ResponseEntity<List<InstanceDto>> getByStatus(@PathVariable Status status){
+        return ResponseEntity.ok(instanceService.getInstanceByStatus(status));
+    }
+    @GetMapping("/instance/{id}")
+    public ResponseEntity<Boolean> deleteInstanceById(@PathVariable long id){
+        Boolean result  = this.instanceService.deleteInstanceById(id);
+        return  ResponseEntity.ok(result);
+    }
+
 
 }

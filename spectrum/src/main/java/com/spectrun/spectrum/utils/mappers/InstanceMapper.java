@@ -2,6 +2,7 @@ package com.spectrun.spectrum.utils.mappers;
 
 import com.spectrun.spectrum.DTO.InstanceDto;
 import com.spectrun.spectrum.models.Instances;
+import com.spectrun.spectrum.models.Users;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
@@ -19,10 +20,18 @@ public interface InstanceMapper {
     @Mapping(target = "configurationFileLocation", source = "configurationFileLocation")
     @Mapping(target = "adminUserName", source = "adminUserName")
     @Mapping(target = "adminPassword", source = "adminPassword")
-    @Mapping(target = "user", source = "users")
+    @Mapping(target = "user", expression = "java(loadUser(instanceDto.getUserId()))")
     @Mapping(target = "createdOn", source = "createdOn")
     @Mapping(target = "updatedOn", source = "updatedOn")
     Instances instanceDtoToInstances(InstanceDto instanceDto);
     InstanceDto instanceToInstaceDto(Instances instances);
+
+    default Users loadUser(Long userId) {
+        if (userId == null) return null;
+        Users u = new Users();
+        u.setId(userId);
+        return u;
+    }
+
 
 }

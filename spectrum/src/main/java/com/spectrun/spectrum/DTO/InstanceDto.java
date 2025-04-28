@@ -1,7 +1,6 @@
 package com.spectrun.spectrum.DTO;
 
 import com.spectrun.spectrum.Enums.Status;
-import com.spectrun.spectrum.models.Users;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,7 +25,7 @@ public class InstanceDto {
     private String configurationFileLocation;
     private String adminUserName;
     private String adminPassword;
-    Users users;
+    private long userId;
     @CreationTimestamp
     private LocalDateTime createdOn;
     @UpdateTimestamp

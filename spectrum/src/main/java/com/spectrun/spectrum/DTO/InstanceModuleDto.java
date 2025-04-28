@@ -12,6 +12,6 @@ import lombok.NoArgsConstructor;
 public class InstanceModuleDto {
     //handle Multiple Module Installation Issue
     ModuleDto installationModule;
-    InstanceDto installationInstance;
+    InstanceCreateRequestDto installationInstance;
 
 }

@@ -26,6 +26,7 @@ public interface UserMapper {
         if (instances == null) {
             return null;
         }
+
         return InstanceDto.builder()
                 .id(instances.getId())
                 .instanceName(instances.getInstanceName())

@@ -26,7 +26,7 @@ private final AuthenticationService authenticationService;
         this.jwtService = jwtService;
         this.authenticationService = authenticationService;
     }
-    @PostMapping("/auth/signup")
+    @PostMapping(value = "/auth/signup",consumes = {"application/json", "application/json;charset=UTF-8"})
     public ResponseEntity<Users> register(@RequestBody UserDTO userDTO)
     {
         Users registereduser = authenticationService.registerUser(userDTO);

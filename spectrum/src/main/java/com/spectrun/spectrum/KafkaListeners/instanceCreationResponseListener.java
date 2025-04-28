@@ -27,23 +27,10 @@ public class instanceCreationResponseListener {
     @KafkaListener(topics = "create_response",groupId = "response_group",containerFactory = "concurrentKafkaListenerContainerFactory")
     public void consume(createInstanceResponse response){
         logger.info(response.toString());
-        InstanceDto instanceDto;
-        LocalDateTime today = LocalDateTime.now();
-            instanceDto = InstanceDto.builder().
-                    instanceName(response.getInstanceName())
-                    .status((response.getInstanceCreationStatus() ? Status.Active : Status.Failed))
-                    .instancedbaddress(response.getInstanceDbAddress())
-                    .instancedbName(response.getInstanceDbName())
-                    .instanceaddress(response.getInstanceAddress())
-                    .configurationFileLocation(response.getConfigurationFileLocation())
-                    .supportedVersion("17")
-                   .adminUserName(response.getAdminUserName())
-                   .adminPassword(response.getAdminPassword())
-                    .createdOn(today)
-                    .updatedOn(today)
-                    .build();
 
-                InstanceDto newinstance =  instanceService.createNewInstance(instanceDto);
+        LocalDateTime today = LocalDateTime.now();
+
+        InstanceDto newinstance =  instanceService.updateInstance(response);
 
 
 

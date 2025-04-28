@@ -37,7 +37,7 @@ public class Subscriptions {
     @JoinColumn(name = "plan_id", nullable = false)
     private Plan plan; // the selected subscription plan,this is only a payment plan
     @OneToMany(mappedBy = "subscription")
-    @JsonManagedReference
+
     private List<Users> users;
 
 }

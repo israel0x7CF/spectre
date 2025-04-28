@@ -53,6 +53,11 @@ public class Users implements UserDetails {
         return List.of();  // Return authorities if you have any roles
     }
 
+//    @Override
+//    public String getPassword() {
+//        return this.password;
+//    }
+
     @Override
     public String getUsername() {
         return this.email;  // Use email as the username

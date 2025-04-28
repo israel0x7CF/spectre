@@ -1,5 +1,6 @@
 package com.spectrun.spectrum.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.spectrun.spectrum.Enums.Status;
 import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
@@ -26,12 +27,14 @@ public class Instances {
     private String instancedbaddress;
     private String instanceaddress;
     private String supportedVersion;
+    @Enumerated(EnumType.STRING)
     private Status status;
     private String configurationFileLocation;
     private String adminUserName;
     private String adminPassword;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private Users user; // An instance belongs to one user
     @Nullable
     @OneToMany(mappedBy = "instance", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

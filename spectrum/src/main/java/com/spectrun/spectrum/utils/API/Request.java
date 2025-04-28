@@ -18,6 +18,7 @@ public class Request<RequestObject, ResponseObject> {
     private final ObjectMapper objectMapper = new ObjectMapper();
     Logger logger = Logger.getLogger(Request.class.getName());
     public ResponseBody<ResponseObject> handleApiCall(RequestObject requestBody, String url, TypeReference<ResponseBody<ResponseObject>> responseType) {
+        logger.info("Revenge Sessions");
         ResponseBody<ResponseObject> response = new ResponseBody<>();
         try {
             // Serialize requestBody to JSON
