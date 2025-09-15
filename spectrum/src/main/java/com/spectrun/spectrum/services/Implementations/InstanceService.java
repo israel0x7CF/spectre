@@ -100,7 +100,7 @@ public class InstanceService implements IInstance {
         instance.setStatus(Status.Active);
         instance.setInstanceaddress(instanceResponse.getInstanceAddress());
         instance.setAdminUserName(instanceResponse.getAdminUserName());
-        instance.setAdminPassword(instanceResponse.getAdminUserName());
+        instance.setAdminPassword(instanceResponse.getAdminPassword());
         instance.setConfigurationFileLocation(instanceResponse.getConfigurationFileLocation());
         instance.setInstancedbName(instanceResponse.getInstanceDbName());
         instance.setInstancedbaddress(instanceResponse.getInstanceAddress());

@@ -20,13 +20,14 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URL;
-import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Logger;
 
+import static com.spectrun.spectrum.utils.URLParser.getPortFromAddress;
+
 @RestController
 @RequestMapping("/api/v1/Instances")
+@Deprecated
 public class InstanceController {
     private InstanceService instanceService;
     private ModuleService moduleService;
@@ -40,18 +41,7 @@ public class InstanceController {
         this.moduleService = moduleService;
     }
 
-    private String getPortFromAddress(String url) throws Exception {
-        String port;
-        try{
-            URL parsedUrl = new URL(url);
-            port = String.valueOf(parsedUrl.getPort());
-            return  port;
 
-        }catch (Exception e){
-            throw new Exception(e.getMessage());
-        }
-
-    }
     @PostMapping("/create/instance")
     public ResponseEntity<?> createNewInstance(@RequestBody InstanceModuleDto installationData){
         String InstanceName = installationData.getInstallationInstance().getInstanceName();
@@ -116,7 +106,6 @@ public class InstanceController {
     }
     @GetMapping("/get/instances/user")
     public  ResponseEntity<List<InstanceDto>> getUserInstances(@RequestParam long id){
-        long Userid = id;
        List<InstanceDto>  userInstances = this.instanceService.getAllUserInstances(id);
        return new ResponseEntity<>(userInstances,HttpStatus.OK);
     }

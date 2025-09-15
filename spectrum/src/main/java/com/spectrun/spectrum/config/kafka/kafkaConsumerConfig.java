@@ -52,4 +52,4 @@ public class kafkaConsumerConfig {
         return factory;
     }
 }
-
+    
