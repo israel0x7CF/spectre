@@ -41,4 +41,7 @@ public class HostService {
       });
       return  null;
     }
+    public boolean checkIfHostExists(String host){
+        return this.hostRepository.existsByhostname(host);
+    }
 }

@@ -4,7 +4,9 @@ import com.spectrun.spectrum.DTO.HostDto;
 import com.spectrun.spectrum.MessageTemplate.initializeServerTemplate;
 import com.spectrun.spectrum.models.Host;
 import com.spectrun.spectrum.services.Implementations.HostService;
+import com.spectrun.spectrum.utils.mappers.HostMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +15,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/host")
 public class host {
     private HostService hostService;
-   private KafkaTemplate<String, initializeServerTemplate> intializeServer;
+    private KafkaTemplate<String, initializeServerTemplate> intializeServer;
+    public HostDto hostToHostDto(Host host){
+        return HostMapper.HOST_MAPPER.hostToHostDto(host);
+    }
+
     public host(HostService hostService,KafkaTemplate<String, initializeServerTemplate> intializeServer) {
 
         this.hostService = hostService;
@@ -21,10 +27,21 @@ public class host {
 
     }
 
-    @PostMapping("/host")
-    public ResponseEntity<HostDto> createNewHost(@RequestBody Host host){
-        HostDto newHost = this.hostService.createHost(host);
-        return  new ResponseEntity<>(newHost, HttpStatus.OK);
+    @PostMapping
+    public ResponseEntity<?> validateAndQueue(@RequestBody Host host){
+        HostDto newHost = this.hostToHostDto(host);
+        //validate this and create a host
+        if(this.hostService.checkIfHostExists(newHost.getHostname())){
+            ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
+            pd.setTitle("Hostname already exists");
+            pd.setDetail("A host with hostname '%s' already exists.".formatted(newHost.getHostname()));
+            pd.setProperty("code", "HOSTNAME_EXISTS");
+            pd.setProperty("field", "hostname");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(pd);
+        }
+        initializeServerTemplate template = new initializeServerTemplate(newHost.getHostname(),newHost.getSshUsername(),newHost.getSshPassword());
+        this.intializeServer.send("initialize-server",template);
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(newHost);
     }
     @GetMapping("/host/{id}")
     public ResponseEntity<HostDto> getHostById(@PathVariable long id)
@@ -53,6 +70,13 @@ public class host {
 //            this.intializeServer.send("initialize-server",template);
         }
         return  new ResponseEntity<>("data",HttpStatus.OK);
+    }
+    //post mapping to create  the host once it has been activiated
+    @PostMapping("/new")
+    public ResponseEntity<Object> createNewHost(@RequestBody Host host){
+        HostDto newHost = this.hostService.createHost(host);
+        //validate this and create a host
+        return  new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
 }
