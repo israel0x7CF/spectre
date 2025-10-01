@@ -1,4 +1,4 @@
-package com.spectrun.spectrum.controllers.subsciption;
+package com.spectrun.spectrum.controllers;
 
 import com.spectrun.spectrum.DTO.PlanDTO;
 import com.spectrun.spectrum.services.Implementations.PlanService;
@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.net.ssl.SSLEngineResult;
 import java.util.List;
 
 // this class is for the admin dashboard only , get requests only for client

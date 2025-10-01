@@ -1,47 +1,54 @@
-package com.spectrun.spectrum.controllers.host;
+package com.spectrun.spectrum.controllers;
 
 import com.spectrun.spectrum.DTO.HostDto;
 import com.spectrun.spectrum.MessageTemplate.initializeServerTemplate;
 import com.spectrun.spectrum.models.Host;
+import com.spectrun.spectrum.models.Jobs;
 import com.spectrun.spectrum.services.Implementations.HostService;
+import com.spectrun.spectrum.services.Implementations.JobsService;
 import com.spectrun.spectrum.utils.mappers.HostMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
+import com.spectrun.spectrum.DTO.InitEnqueuedResponse;
 
 @RestController
 @RequestMapping("/api/v1/host")
 public class host {
     private HostService hostService;
     private KafkaTemplate<String, initializeServerTemplate> intializeServer;
+    private JobsService jobsService;
     public HostDto hostToHostDto(Host host){
         return HostMapper.HOST_MAPPER.hostToHostDto(host);
     }
 
-    public host(HostService hostService,KafkaTemplate<String, initializeServerTemplate> intializeServer) {
-
-        this.hostService = hostService;
+    public host(HostService hostService,KafkaTemplate<String, initializeServerTemplate> intializeServer,JobsService jobsService) {
+     this.hostService = hostService;
      this.intializeServer = intializeServer;
-
+     this.jobsService = jobsService;
     }
 
     @PostMapping
-    public ResponseEntity<?> validateAndQueue(@RequestBody Host host){
-        HostDto newHost = this.hostToHostDto(host);
+    public ResponseEntity<?> validateAndQueue(@RequestBody Host host, UriComponentsBuilder uri){
+
         //validate this and create a host
-        if(this.hostService.checkIfHostExists(newHost.getHostname())){
+        if(this.hostService.checkIfHostExists(host.getHostname())){
             ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.CONFLICT);
             pd.setTitle("Hostname already exists");
-            pd.setDetail("A host with hostname '%s' already exists.".formatted(newHost.getHostname()));
+            pd.setDetail("A host with hostname '%s' already exists.".formatted(host.getHostname()));
             pd.setProperty("code", "HOSTNAME_EXISTS");
             pd.setProperty("field", "hostname");
             return ResponseEntity.status(HttpStatus.CONFLICT).body(pd);
         }
-        initializeServerTemplate template = new initializeServerTemplate(newHost.getHostname(),newHost.getSshUsername(),newHost.getSshPassword());
+        initializeServerTemplate template = new initializeServerTemplate(host.getHostname(),host.getSshUsername(),host.getSshPassword());
         this.intializeServer.send("initialize-server",template);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(newHost);
+        Jobs job = this.jobsService.CreatePendingJob("init-host:" + host.getHostname());
+        return ResponseEntity.accepted()
+                .location(uri.path("/hosts/jobs/{id}").buildAndExpand(job.getId()).toUri())
+                .body(new InitEnqueuedResponse(job.getId(), "PENDING"));
     }
     @GetMapping("/host/{id}")
     public ResponseEntity<HostDto> getHostById(@PathVariable long id)
@@ -75,8 +82,8 @@ public class host {
     @PostMapping("/new")
     public ResponseEntity<Object> createNewHost(@RequestBody Host host){
         HostDto newHost = this.hostService.createHost(host);
-        //validate this and create a host
-        return  new ResponseEntity<>(HttpStatus.ACCEPTED);
+
+        return  ResponseEntity.status(HttpStatus.CREATED).body(newHost);
     }
 
 }

@@ -1,4 +1,4 @@
-package com.spectrun.spectrum.controllers.Authentication;
+package com.spectrun.spectrum.controllers;
 
 import lombok.Getter;
 import lombok.Setter;

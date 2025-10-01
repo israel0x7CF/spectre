@@ -20,5 +20,7 @@ public class Host {
     private String sshUsername;
     private String sshPassword;
     private String mode;
+    private String jobId;
+    private String callBackUrl;
 
 }

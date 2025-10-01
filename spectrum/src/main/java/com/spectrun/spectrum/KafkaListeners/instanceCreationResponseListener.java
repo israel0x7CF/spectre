@@ -1,9 +1,7 @@
 package com.spectrun.spectrum.KafkaListeners;
 
 import com.spectrun.spectrum.DTO.InstanceDto;
-import com.spectrun.spectrum.Enums.Status;
 import com.spectrun.spectrum.MessageTemplate.createInstanceResponse;
-import com.spectrun.spectrum.controllers.test.kafkaTest;
 import com.spectrun.spectrum.services.Implementations.InstanceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;

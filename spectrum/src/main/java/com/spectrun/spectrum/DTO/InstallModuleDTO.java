@@ -23,12 +23,3 @@ public class InstallModuleDTO {
 
 }
 
-
-//{
-//        "user": "admin",
-//        "password": "superadminsaas",
-//        "host": "127.0.0.1",
-//        "port": "39221",
-//        "db": "nova2_db",
-//        "module": "afrotie_odoo"
-//        }

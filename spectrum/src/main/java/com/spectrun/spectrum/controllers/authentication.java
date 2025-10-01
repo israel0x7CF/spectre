@@ -1,4 +1,4 @@
-package com.spectrun.spectrum.controllers.Authentication;
+package com.spectrun.spectrum.controllers;
 
 import com.spectrun.spectrum.DTO.LoginDto;
 import com.spectrun.spectrum.DTO.UserDTO;

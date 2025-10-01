@@ -1,4 +1,4 @@
-package com.spectrun.spectrum.controllers.instances;
+package com.spectrun.spectrum.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.spectrun.spectrum.DTO.*;

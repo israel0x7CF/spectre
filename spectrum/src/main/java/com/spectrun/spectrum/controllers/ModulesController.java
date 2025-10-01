@@ -1,4 +1,4 @@
-package com.spectrun.spectrum.controllers.instances;
+package com.spectrun.spectrum.controllers;
 
 import com.spectrun.spectrum.DTO.InstallModuleDTO;
 import com.spectrun.spectrum.DTO.InstanceDto;
@@ -9,7 +9,6 @@ import com.spectrun.spectrum.utils.API.Request;
 import com.spectrun.spectrum.utils.API.RequestDTO.RemoteInstanceModule;
 import com.spectrun.spectrum.utils.API.ResponseBody.ResponseBody;
 import com.spectrun.spectrum.utils.API.ResponseBody.ModuleStatus;
-import com.spectrun.spectrum.utils.API.ResponseDTO.moduleInstallResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

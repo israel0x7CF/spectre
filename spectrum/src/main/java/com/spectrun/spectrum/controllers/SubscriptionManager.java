@@ -1,9 +1,7 @@
-package com.spectrun.spectrum.controllers.subsciption;
+package com.spectrun.spectrum.controllers;
 
 
 import com.spectrun.spectrum.DTO.SubscriptionDTO;
-import com.spectrun.spectrum.controllers.userController.userController;
-import com.spectrun.spectrum.models.Subscriptions;
 import com.spectrun.spectrum.services.Implementations.SubscriptionService;
 import com.spectrun.spectrum.utils.exceptions.PlanNotFoundException;
 import org.slf4j.Logger;
@@ -11,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

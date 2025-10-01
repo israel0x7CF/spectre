@@ -2,7 +2,6 @@
 
     import com.fasterxml.jackson.core.type.TypeReference;
     import com.fasterxml.jackson.databind.ObjectMapper;
-    import com.spectrun.spectrum.controllers.test.kafkaTest;
     import com.spectrun.spectrum.utils.API.ResponseBody.ResponseBody;
 
     import java.net.URI;

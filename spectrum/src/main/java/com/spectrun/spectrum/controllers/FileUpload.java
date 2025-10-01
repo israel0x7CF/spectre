@@ -1,4 +1,4 @@
-package com.spectrun.spectrum.controllers.fileUpload;
+package com.spectrun.spectrum.controllers;
 
 import com.spectrun.spectrum.DTO.ModuleDto;
 import com.spectrun.spectrum.services.Implementations.ModuleService;
@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
-import java.util.Map;
 
 
 @RestController
