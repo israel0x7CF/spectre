@@ -42,11 +42,18 @@ public class GlobalExceptionHandler {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(403), exception.getMessage());
             errorDetail.setProperty("description", "The JWT token has expired");
         }
+        if (exception instanceof CallbackAuthException){
+            errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(40), exception.getMessage());
+            errorDetail.setProperty("description", "The JWT token has expired");
+            errorDetail.setProperty("code",((CallbackAuthException) exception).getShortCode());
+            errorDetail.setProperty("status",((CallbackAuthException) exception ).getExceptionStatus());
+        }
 
         if (errorDetail == null) {
             errorDetail = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(500), exception.getMessage());
             errorDetail.setProperty("description", "Unknown internal server error.");
         }
+
 
         return  errorDetail;
 

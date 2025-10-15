@@ -45,4 +45,7 @@ private final AuthenticationService authenticationService;
 
         return ResponseEntity.ok(loginResponse);
     }
+
+    //fast api token request
+
 }

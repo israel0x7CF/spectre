@@ -5,12 +5,13 @@ import com.spectrun.spectrum.models.Jobs;
 import com.spectrun.spectrum.repositories.JobsRepository;
 
 import jakarta.transaction.Transactional;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
-
+import org.springframework.web.util.UriComponentsBuilder;
+import java.net.URL;
 import java.time.Instant;
 import java.util.Objects;
 
@@ -18,10 +19,20 @@ import java.util.Objects;
 public class JobsService {
   private JobsRepository jobsRepository;
 
+    @Value("${app.publicBaseUrl}")
+    private String publicBaseUrl;
   public JobsService(JobsRepository jobsRepository) {
     this.jobsRepository = jobsRepository;
   }
 
+
+  private String generateCallBackUrl(long jobId){
+    return  UriComponentsBuilder.fromHttpUrl(publicBaseUrl)
+            .path("/api/v1/jobs/{id}/callback")
+            .buildAndExpand(jobId)
+            .toUriString();
+  }
+  @Transactional
   public Jobs CreatePendingJob(String idempotencyKey){
     Objects.requireNonNull(idempotencyKey,"idempotencyKey");
     return  jobsRepository.findByIdempotencyKey(idempotencyKey).orElseGet(
@@ -31,9 +42,18 @@ public class JobsService {
               j.setStatus(JobStatus.PENDING);
               j.setCreatedAt(Instant.now());
               j.setUpdatedAt(j.getCreatedAt());
-              return  jobsRepository.save(j);
+
+              Jobs saved = jobsRepository.save(j);
+
+              String callBackUrl = this.generateCallBackUrl(saved.getId());
+
+              saved.setCallbackUrl(callBackUrl);
+
+              return  jobsRepository.save(saved);   
+
+
             }
-            //todo: build callback url
+
     );
   }
   public Jobs getJobById(long id){
@@ -69,7 +89,9 @@ public class JobsService {
       }
 
   }
-
+    public Jobs getJobByIdemKy(String idempotencyKey){
+        return  this.jobsRepository.findByIdempotencyKey(idempotencyKey).orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND, "Job not found"));
+    }
   @Transactional
   public void markJobAsFailed(long jobId,String errorMessage){
       updateJobStatus(jobId,JobStatus.FAILED,errorMessage,false);
