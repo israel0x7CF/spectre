@@ -4,6 +4,9 @@ import os
 import odoorpc
 import argparse
 
+from InstanceManager.routes.utils.restart_container import container_restart
+
+
 def prepare_args():
     """Prepare arguments for module action RPC call."""
     parser = argparse.ArgumentParser(
@@ -93,12 +96,14 @@ def move_module_to_instance_dir(instance_path, module_dir):
 
 
 def install_to_instance(instance_user,instance_password,instance_host,instance_port,instance_db,module_name,is_active):
+    print("---------------installing module-----------------------")
     try:
         args = prepare_args()
         print(instance_db,instance_password,instance_host,instance_user,instance_port)
-        if is_active:
-
-            pass
+        # if is_active:
+        #     #container already exists we are adding new module
+        #
+        #     pass
         odoo = login(instance_user, instance_password, instance_host, instance_port, instance_db)
         env = odoo.env
         print(env)
@@ -132,6 +137,21 @@ def install_to_instance(instance_user,instance_password,instance_host,instance_p
             "data": None
         }
         return response_data
+
+def install_to_running_instance(existing_module,container_id,instance_username,instance_password,instance_host,instance_port,instance_db,module_name):
+    if not existing_module:
+        #module does not exist in the instances dir,
+        #move module to instance dir restart then install restart instance again
+
+        pass
+    ## if module exists in the instance dir then install it and restart it
+
+    try:
+        install_status = install_to_instance(instance_username,instance_password,instance_host,instance_port,instance_db,module_name,False)
+    except Exception as e:
+        print(e)
+    if install_status.get("status") == 200:
+        container_restart(container_id)
 
 
 

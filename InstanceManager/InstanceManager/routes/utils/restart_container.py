@@ -1,10 +1,9 @@
 import subprocess
-def container_restart():
+def container_restart(container_id):
     try:
-        container_name="cc93dc02f177"
         # Run the docker restart command
         result = subprocess.run(
-            ["/usr/bin/docker", "restart", container_name],
+            ["/usr/bin/docker", "restart", container_id],
             check=True,  # Ensures an exception is raised on non-zero exit
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -12,12 +11,12 @@ def container_restart():
         )
 
         # Output success message
-        print(f"Container '{container_name}' restarted successfully.")
+        print(f"Container '{container_id}' restarted successfully.")
         print("Output:", result.stdout)
 
     except subprocess.CalledProcessError as e:
         # Handle errors in subprocess execution
-        print(f"Error restarting container '{container_name}': {e.stderr}")
+        print(f"Error restarting container '{container_id}': {e.stderr}")
     except FileNotFoundError:
         print("Docker is not installed or not found in PATH.")
 

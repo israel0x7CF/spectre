@@ -23,7 +23,7 @@ class TimeoutTransport(xmlrpc.client.Transport):
 
 
 # Function to configure Odoo database with retry and sleep logic
-def configure_odoo_database(instanceUrl,instance_port,odoo_instance_url,database_name, timeout=60, max_retries=3):
+def configure_odoo_database(instanceUrl,instance_port,odoo_instance_url,database_name, timeout=120, max_retries=3):
     url = f'{odoo_instance_url}/xmlrpc/2/db'
     config_response = {}
     print(instanceUrl,instance_port)

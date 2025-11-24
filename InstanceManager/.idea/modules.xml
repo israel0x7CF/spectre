@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/DockerAutomations.iml" filepath="$PROJECT_DIR$/.idea/DockerAutomations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/InstanceManager.iml" filepath="$PROJECT_DIR$/.idea/InstanceManager.iml" />
     </modules>
   </component>
 </project>

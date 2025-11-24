@@ -39,12 +39,14 @@ def kafka_container_listener():
                 try:
                     msg_value = msg.value().decode('utf-8')
                     data_json = json.loads(msg_value)
+                    print(data_json)
                     instance_name  = data_json["instanceName"]
                     module_name = data_json['moduleName']
                     module_path = data_json['modulePath']
+                    #add host address
 
                     future = executor.submit(create_container, instance_name,module_name,module_path)
-                    def executor_callback(fut ):
+                    def executor_callback(fut):
                         try:
                             result = future.result()
                             print("creationResult",result)
