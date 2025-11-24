@@ -14,6 +14,8 @@ public class initializeServerTemplate implements Serializable {
     private String username;
     private  String password;
     private String token;
+    private String callbackUrl;
+    private long JobId;
 
     public String getHost() {
         return host;
@@ -45,5 +47,21 @@ public class initializeServerTemplate implements Serializable {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getCallbackUrl() {
+        return callbackUrl;
+    }
+
+    public void setCallbackUrl(String callbackUrl) {
+        this.callbackUrl = callbackUrl;
+    }
+
+    public long getJobId() {
+        return JobId;
+    }
+
+    public void setJobId(long jobId) {
+        JobId = jobId;
     }
 }

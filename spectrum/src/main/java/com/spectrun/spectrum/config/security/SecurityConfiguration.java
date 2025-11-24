@@ -29,7 +29,7 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
         httpSecurity.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> authorizationManagerRequestMatcherRegistry
-                        .requestMatchers("/api/v1/auth/**","/api/v1/test/**")
+                        .requestMatchers("/api/v1/auth/**","/api/v1/test/**","/api/v1/jobs/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()
